@@ -22,8 +22,9 @@ WORKDIR /root
 RUN apk add --no-cache helm curl bash jq \
     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl \
-    && curl -LO "https://github.com/loft-sh/vcluster/releases/latest/download/vcluster-linux-amd64" \
-    && chmod +x vcluster-linux-amd64 && mv vcluster-linux-amd64 /usr/local/bin/vcluster
+    && curl -LO "https://github.com/loft-sh/vcluster/releases/download/v0.30.4/vcluster-linux-amd64" \
+    && chmod +x vcluster-linux-amd64 && mv vcluster-linux-amd64 /usr/local/bin/vcluster \
+    && vcluster version
 
 # Copy the backend binary from the builder stage
 COPY --from=builder /app/vcluster-backend /usr/local/bin/

@@ -1,102 +1,911 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>vCluster Creator UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeHatch - Internal Developer Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px var(--shadow);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .vcluster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .vcluster-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px var(--shadow);
+        }
+
+        .vcluster-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .vcluster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .vcluster-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-running {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .vcluster-details {
+            margin: 1rem 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .vcluster-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .kubeconfig-display {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 400px;
+            overflow-y: auto;
+            color: var(--text);
+            margin: 1rem 0;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .vcluster-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Create Virtual Cluster</h1>
-    <form id="vclusterForm" enctype="multipart/form-data">
-        <label for="kubeconfigFile">Upload Host Kubeconfig File (Optional):</label><br>
-        <input type="file" id="kubeconfigFile" name="kubeconfigFile"><br><br>
+    <header>
+        <div class="header-content">
+            <div class="logo">🚀 KubeHatch</div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+                <button class="nav-tab" data-tab="create">Create Cluster</button>
+            </nav>
+        </div>
+    </header>
 
-        <label for="name">Virtual Cluster Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <div class="container">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Total Clusters</div>
+                    <div class="stat-value" id="statTotal">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Running</div>
+                    <div class="stat-value" id="statRunning">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value" id="statPending">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-label">HA Enabled</div>
+                    <div class="stat-value" id="statHA">-</div>
+                </div>
+            </div>
 
-        <label for="ha">Enable HA:</label>
-        <input type="checkbox" id="ha" name="ha"><br><br>
+            <div class="card">
+                <div class="card-title">Your Virtual Clusters</div>
+                <div id="vclusterList" class="vcluster-grid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div>Loading clusters...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <label for="loadbalancer">Enable LoadBalancer:</label>
-        <input type="checkbox" id="loadbalancer" name="loadbalancer"><br><br>
+        <!-- Create Cluster Section -->
+        <div id="create" class="content-section">
+            <div class="card">
+                <div class="card-title">Create New Virtual Cluster</div>
+                <div id="createAlert"></div>
+                <form id="vclusterForm">
+                    <div class="form-group">
+                        <label class="form-label" for="clusterName">Cluster Name *</label>
+                        <input 
+                            type="text" 
+                            id="clusterName" 
+                            name="clusterName" 
+                            class="form-input" 
+                            placeholder="my-vcluster"
+                            required
+                            pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?"
+                            title="Lowercase alphanumeric characters and hyphens only"
+                        >
+                        <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                            Must be lowercase alphanumeric with hyphens (e.g., dev-cluster-01)
+                        </small>
+                    </div>
 
-        <button type="submit" id="submitButton">Create</button>
-    </form>
+                    <div class="form-group">
+                        <label class="form-label">Host Kubeconfig (Optional)</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <div>📁 Click to upload or drag and drop</div>
+                            <div class="file-name" id="fileName">No file selected</div>
+                            <input 
+                                type="file" 
+                                id="kubeconfigFile" 
+                                name="kubeconfigFile" 
+                                accept=".yaml,.yml"
+                                style="display: none;"
+                            >
+                        </div>
+                    </div>
 
-    <div id="result" style="display:none;">
-        <h2>Generated Kubeconfig</h2>
-        <textarea id="kubeconfigResult" rows="20" cols="100"></textarea>
-        <br><br>
-        <a id="downloadLink" href="#">Download Kubeconfig</a>
+                    <div class="form-group">
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="ha" name="ha" class="form-checkbox">
+                            <label for="ha" class="form-label" style="margin: 0; cursor: pointer;">
+                                Enable High Availability (3 replicas)
+                            </label>
+                        </div>
+                        <div class="form-checkbox-group">
+                            <input type="checkbox" id="loadbalancer" name="loadbalancer" class="form-checkbox">
+                            <label for="loadbalancer" class="form-label" style="margin: 0; cursor: pointer;">
+                                Expose via LoadBalancer (External Access)
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitButton" class="btn btn-primary">
+                        <span id="submitText">Create Cluster</span>
+                        <span id="submitLoader" class="loading" style="display: none;"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="resultCard" class="card" style="display: none;">
+                <div class="card-title">✅ Cluster Created Successfully!</div>
+                <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                    <strong>📝 Note for Local Kind Clusters:</strong> If you're using a local kind cluster, you need to run port-forwarding in a separate terminal:<br>
+                    <code style="background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 4px; margin-top: 0.5rem; display: inline-block;">vcluster connect <span id="connectClusterName"></span> --namespace vcluster-<span id="connectClusterName2"></span></code>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Kubeconfig</label>
+                    <div class="kubeconfig-display" id="kubeconfigResult"></div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="downloadBtn" class="btn btn-primary">Download Kubeconfig</button>
+                    <button id="copyBtn" class="btn btn-secondary">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Store the previous Blob URL to revoke it later
+        // API Base URL configuration
+        // Auto-detect: if on localhost with default port, use full backend URL
+        // For production or proxy setup, use '/api' (default)
+        const urlParams = new URLSearchParams(window.location.search);
+        let API_BASE = urlParams.get('api_base');
+        
+        if (!API_BASE) {
+            // Auto-detect localhost development
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                // Use full backend URL for local development
+                API_BASE = 'http://localhost:8081/api';
+            } else {
+                // Use relative path for production/proxy
+                API_BASE = '/api';
+            }
+        }
         let previousBlobUrl = null;
 
-        document.getElementById("vclusterForm").addEventListener("submit", async function(e) {
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                if (targetTab === 'dashboard') {
+                    loadDashboard();
+                }
+            });
+        });
+
+        // File upload handling
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('kubeconfigFile');
+        const fileName = document.getElementById('fileName');
+
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+        fileUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-
-            // Disable submit button to prevent duplicate requests
-            const submitButton = document.getElementById("submitButton");
-            submitButton.disabled = true;
-
-            // Clear previous results
-            const resultDiv = document.getElementById("result");
-            const kubeconfigResult = document.getElementById("kubeconfigResult");
-            const downloadLink = document.getElementById("downloadLink");
-            kubeconfigResult.value = ""; // Clear textarea
-            resultDiv.style.display = "none"; // Hide result div
-            if (previousBlobUrl) {
-                URL.revokeObjectURL(previousBlobUrl); // Revoke previous Blob URL
-                previousBlobUrl = null;
+            fileUploadArea.classList.add('dragover');
+        });
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName();
             }
-            downloadLink.href = "#"; // Reset download link
+        });
+        fileInput.addEventListener('change', updateFileName);
 
-            // Build form data
-            const formData = new FormData();
-            const fileInput = document.getElementById("kubeconfigFile");
-
+        function updateFileName() {
             if (fileInput.files.length > 0) {
-                formData.append("kubeconfigFile", fileInput.files[0]);
+                fileName.textContent = fileInput.files[0].name;
+            } else {
+                fileName.textContent = 'No file selected';
             }
+        }
 
-            formData.append("clusterName", document.getElementById("name").value);
+        // Form submission
+        document.getElementById('vclusterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitButton');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            const resultCard = document.getElementById('resultCard');
+            const createAlert = document.getElementById('createAlert');
 
-            if (document.getElementById("ha").checked) {
-                formData.append("ha", "on");
+            submitButton.disabled = true;
+            submitText.textContent = 'Creating Cluster...';
+            submitLoader.style.display = 'inline-block';
+            resultCard.style.display = 'none';
+            createAlert.innerHTML = '';
+
+            const formData = new FormData();
+            const clusterName = document.getElementById('clusterName').value;
+            
+            if (fileInput.files.length > 0) {
+                formData.append('kubeconfigFile', fileInput.files[0]);
             }
-
-            if (document.getElementById("loadbalancer").checked) {
-                formData.append("loadbalancer", "on");
+            formData.append('clusterName', clusterName);
+            if (document.getElementById('ha').checked) {
+                formData.append('ha', 'on');
+            }
+            if (document.getElementById('loadbalancer').checked) {
+                formData.append('loadbalancer', 'on');
             }
 
             try {
-                const response = await fetch("/api/vcluster", {
-                    method: "POST",
+                const response = await fetch(`${API_BASE}/vcluster`, {
+                    method: 'POST',
                     body: formData
                 });
 
                 if (!response.ok) {
-                    throw new Error("Error creating vCluster: " + await response.text());
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Failed to create cluster');
                 }
 
                 const data = await response.json();
-                kubeconfigResult.value = data.kubeconfig;
-                resultDiv.style.display = "block";
+                document.getElementById('kubeconfigResult').textContent = data.kubeconfig;
+                document.getElementById('connectClusterName').textContent = clusterName;
+                document.getElementById('connectClusterName2').textContent = clusterName;
+                resultCard.style.display = 'block';
 
-                // Create new Blob and URL for download
-                const blob = new Blob([data.kubeconfig], { type: 'application/octet-stream' });
+                // Setup download
+                if (previousBlobUrl) {
+                    URL.revokeObjectURL(previousBlobUrl);
+                }
+                const blob = new Blob([data.kubeconfig], { type: 'application/yaml' });
                 const url = URL.createObjectURL(blob);
-                downloadLink.href = url;
-                downloadLink.download = "kubeconfig.yaml";
-                previousBlobUrl = url; // Store the URL to revoke later
+                previousBlobUrl = url;
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `kubeconfig-${clusterName}.yaml`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+                // Setup copy
+                document.getElementById('copyBtn').onclick = () => {
+                    navigator.clipboard.writeText(data.kubeconfig);
+                    showAlert(createAlert, 'Kubeconfig copied to clipboard!', 'success');
+                };
+
+                showAlert(createAlert, 'Cluster created successfully!', 'success');
+                document.getElementById('vclusterForm').reset();
+                updateFileName();
+                
+                // Refresh dashboard after a delay
+                setTimeout(() => {
+                    if (document.getElementById('dashboard').classList.contains('active')) {
+                        loadDashboard();
+                    } else {
+                        document.querySelector('[data-tab="dashboard"]').click();
+                    }
+                }, 2000);
 
             } catch (error) {
-                alert(error.message);
+                showAlert(createAlert, error.message, 'error');
             } finally {
-                // Re-enable submit button after request is complete
                 submitButton.disabled = false;
+                submitText.textContent = 'Create Cluster';
+                submitLoader.style.display = 'none';
             }
         });
+
+        // Load dashboard
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/vclusters`);
+                if (!response.ok) throw new Error('Failed to load clusters');
+                const clusters = await response.json();
+                renderClusters(clusters);
+                updateStats(clusters);
+            } catch (error) {
+                document.getElementById('vclusterList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div>Failed to load clusters: ${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderClusters(clusters) {
+            const container = document.getElementById('vclusterList');
+            
+            if (!clusters || clusters.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📦</div>
+                        <div>No virtual clusters found</div>
+                        <div style="margin-top: 1rem; color: var(--text-muted);">
+                            Create your first cluster to get started!
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = clusters.map(cluster => `
+                <div class="vcluster-card">
+                    <div class="vcluster-header">
+                        <div class="vcluster-name">${escapeHtml(cluster.name)}</div>
+                        <span class="status-badge status-${cluster.status.toLowerCase()}">
+                            ${cluster.status}
+                        </span>
+                    </div>
+                    <div class="vcluster-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Namespace</span>
+                            <span class="detail-value">${escapeHtml(cluster.namespace)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">HA Mode</span>
+                            <span class="detail-value">${cluster.ha ? '✅ Yes' : '❌ No'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">LoadBalancer</span>
+                            <span class="detail-value">${cluster.loadBalancer ? '✅ Enabled' : '❌ Disabled'}</span>
+                        </div>
+                        ${cluster.endpoint ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Endpoint</span>
+                            <span class="detail-value" style="font-size: 0.75rem; word-break: break-all;">${escapeHtml(cluster.endpoint)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-row">
+                            <span class="detail-label">Created</span>
+                            <span class="detail-value">${formatDate(cluster.createdAt)}</span>
+                        </div>
+                    </div>
+                    <div class="vcluster-actions">
+                        <button class="btn btn-primary btn-sm" onclick="downloadKubeconfig('${escapeHtml(cluster.name)}')">
+                            📥 Download Config
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="viewKubeconfig('${escapeHtml(cluster.name)}')">
+                            👁️ View Config
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCluster('${escapeHtml(cluster.name)}')">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats(clusters) {
+            const total = clusters.length;
+            const running = clusters.filter(c => c.status === 'Running').length;
+            const pending = clusters.filter(c => c.status === 'Pending').length;
+            const ha = clusters.filter(c => c.ha).length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statRunning').textContent = running;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statHA').textContent = ha;
+        }
+
+        async function downloadKubeconfig(clusterName) {
+            try {
+                const response = await fetch(`${API_BASE}/vcluster/${encodeURIComponent(clusterName)}/kubeconfig`);
+                if (!response.ok) throw new Error('Failed to download kubeconfig');
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `kubeconfig-${clusterName}.yaml`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function viewKubeconfig(clusterName) {
+            try {
+                const response = await fetch(`${API_BASE}/vcluster/${encodeURIComponent(clusterName)}/kubeconfig`);
+                if (!response.ok) throw new Error('Failed to fetch kubeconfig');
+                const blob = await response.blob();
+                const text = await blob.text();
+                
+                // Show in modal or result card
+                document.getElementById('kubeconfigResult').textContent = text;
+                document.getElementById('resultCard').style.display = 'block';
+                document.querySelector('[data-tab="create"]').click();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function deleteCluster(clusterName) {
+            if (!confirm(`Are you sure you want to delete cluster "${clusterName}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/vcluster/${encodeURIComponent(clusterName)}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || 'Failed to delete cluster');
+                }
+                showAlert(document.getElementById('createAlert'), `Cluster "${clusterName}" deleted successfully`, 'success');
+                loadDashboard();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function showAlert(container, message, type) {
+            container.innerHTML = `<div class="alert alert-${type}">${escapeHtml(message)}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        // Load dashboard on page load
+        loadDashboard();
+        setInterval(loadDashboard, 30000); // Refresh every 30 seconds
     </script>
 </body>
 </html>

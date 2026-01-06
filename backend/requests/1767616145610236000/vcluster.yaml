@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: VirtualCluster
+metadata:
+  name: demo
+spec:
+  replicas: 1
